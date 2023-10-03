@@ -115,6 +115,7 @@ function getCircle(xo, yo, isOffset){
 					//try solving the melting edges bug
 					unitW= unitW<10?(10-unitW)*unitW:unitW;
 					ctx.fillRect( m*unitWx+240, 300 - (unitH)*2, unitW*2, (unitH)*4 );
+
 					//exit for
 					isInter=true;
 					break;
