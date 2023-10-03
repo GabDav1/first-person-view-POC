@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 let x = 150;
 let y = 200;
-let xo1 = x-2;//todo:maybe test different offsets???
+let xo1 = x-1;//todo:maybe test different offsets???
 let yo1 = y;
 let radius = 15;
 let speed = 1;
@@ -50,7 +50,7 @@ function drawSpace(){
 	boundryCheck();
 	
 	getCircle(x, y, false);
-	//getCircle(xo1, yo1, true);
+	getCircle(xo1, yo1, true);
 };
 
 function backGd(xb, yb){
@@ -95,7 +95,8 @@ function getCircle(xo, yo, isOffset){
 		isInter= false;
 		
 		//width is narrower at the edges
-		let unitW = m*Math.abs((45-m))+1;
+		//let unitW = m*Math.abs((45-m))+1;
+		let unitW = m<45?m:(90-m);
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
 		
@@ -110,13 +111,14 @@ function getCircle(xo, yo, isOffset){
 			//wall loop intersect (ray tracing)
 			for (let k=0;k<200;k++){
 				if(((k+20) == xi) && yi == wall[k]){//collision
-					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/90)*i + `, ${diffColor})`;
-					ctx.fillRect( m*unitWx+180, 300 - unitH*2, unitW, unitH*4 );
+					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
+					//try solving the melting edges bug
+					unitW= unitW<10?(10-unitW)*unitW:unitW;
+					ctx.fillRect( m*unitWx+240, 300 - (unitH)*2, unitW*2, (unitH)*4 );
 					//exit for
 					isInter=true;
 					break;
 				}
-			
 			}
 			//if isInterrupted break
 			if (isInter) break;
@@ -132,7 +134,7 @@ function inputs(){
 		x = Math.sin((cAngle-45)*Math.PI/180)*speed+x;
 		y = -Math.cos((cAngle-45)*Math.PI/180)*speed+y;
 		//isUp = true;
-		xo1 = x-2;
+		xo1 = x-1;
 		yo1 = y;
     }
     if(downArrowPressed){
@@ -140,7 +142,7 @@ function inputs(){
 		x = Math.sin((cAngle+135)*Math.PI/180)*speed+x;
 		y = -Math.cos((cAngle+135)*Math.PI/180)*speed+y;
 		//isUp = false;
-		xo1 = x-2;
+		xo1 = x-1;
 		yo1 = y;
     }
     if(leftArrowPressed){
