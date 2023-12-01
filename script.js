@@ -50,7 +50,7 @@ function drawSpace(){
 	boundryCheck();
 	
 	getCircle(x, y, false);
-	getCircle(xo1, yo1, true);
+	//getCircle(xo1, yo1, true);
 };
 
 function backGd(xb, yb){
@@ -85,7 +85,7 @@ function backGd(xb, yb){
 }
 
 function getCircle(xo, yo, isOffset){
-	const diffColor = isOffset? 127:255;
+	//const diffColor = isOffset? 127:255;
 	let xi = xo;
 	let yi = yo;
 	let m = 1;
@@ -95,8 +95,9 @@ function getCircle(xo, yo, isOffset){
 		isInter= false;
 		
 		//width is narrower at the edges
-		const hOffset = Math.abs(45-m);
+		//Math.abs(45-m);//higher at the edges
 		let unitW = m<45?m:(90-m);
+		const hOffset = unitW/2;
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
 		
@@ -108,13 +109,15 @@ function getCircle(xo, yo, isOffset){
 			let unitH = 300/j;
 			xi = parseInt(Math.sin(i*Math.PI/180)*j+xo);
 			yi = parseInt(-Math.cos(i*Math.PI/180)*j+yo);
+			//color test
+			const diffColor = i%2===0? 127:255;
 			//wall loop intersect (ray tracing)
 			for (let k=0;k<200;k++){
 				if(((k+20) == xi) && yi == wall[k]){//collision
 					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
 					//try solving the melting edges bug
 					unitW= unitW<10?(10-unitW)*unitW:unitW;
-					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset)*2, unitW*2, (unitH+hOffset)*4 );
+					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset), unitW*2, (unitH+hOffset)*2 );
 
 					//exit for
 					isInter=true;
