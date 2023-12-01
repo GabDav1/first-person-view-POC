@@ -97,7 +97,7 @@ function getCircle(xo, yo, isOffset){
 		//width is narrower at the edges
 		//Math.abs(45-m);//higher at the edges
 		let unitW = m<45?m:(90-m);
-		const hOffset = unitW/2;
+		const hOffset = 0;//unitW;
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
 		
@@ -107,6 +107,7 @@ function getCircle(xo, yo, isOffset){
 		
 			//size of object
 			let unitH = 300/j;
+			//if(upArrowPressed){console.log("height is "+unitH+" and x pos is "+(m*unitWx+240));}
 			xi = parseInt(Math.sin(i*Math.PI/180)*j+xo);
 			yi = parseInt(-Math.cos(i*Math.PI/180)*j+yo);
 			//color test
@@ -115,9 +116,11 @@ function getCircle(xo, yo, isOffset){
 			for (let k=0;k<200;k++){
 				if(((k+20) == xi) && yi == wall[k]){//collision
 					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
-					//try solving the melting edges bug
+					//try solving the melting edges bug and filling gaps
 					unitW= unitW<10?(10-unitW)*unitW:unitW;
-					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset), unitW*2, (unitH+hOffset)*2 );
+					unitW=unitW>35?(48-unitW)*5:unitW;
+					
+					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset), unitW+10, (unitH+hOffset)*2 );
 
 					//exit for
 					isInter=true;
