@@ -95,7 +95,7 @@ function getCircle(xo, yo, isOffset){
 		isInter= false;
 		
 		//width is narrower at the edges
-		//let unitW = m*Math.abs((45-m))+1;
+		const hOffset = Math.abs(45-m);
 		let unitW = m<45?m:(90-m);
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
@@ -114,7 +114,7 @@ function getCircle(xo, yo, isOffset){
 					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
 					//try solving the melting edges bug
 					unitW= unitW<10?(10-unitW)*unitW:unitW;
-					ctx.fillRect( m*unitWx+240, 300 - (unitH)*2, unitW*2, (unitH)*4 );
+					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset)*2, unitW*2, (unitH+hOffset)*4 );
 
 					//exit for
 					isInter=true;
