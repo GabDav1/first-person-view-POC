@@ -6,10 +6,11 @@ let y = 200;
 let xo1 = x-1;//todo:maybe test different offsets???
 let yo1 = y;
 let radius = 15;
-let speed = 0.1;
+let speed = 0.5;
 let cAngle = 90;
 //position on the horizon line
 const unitWx = 900/90;
+const unitW = 10;
 
 const pointsCol = {};///points actually
 
@@ -45,6 +46,22 @@ function generateRandomPoint() {
 }
 generateRandomPoint();
 
+//red walls
+	ctx.fillStyle = "red";
+	//for (let k=0;k<250;k++){
+		//ctx.fillRect( k+20, wall[k] , 1, 1 );//TODO FROM HERE BUT WITH POINTSCALL
+	//}
+		
+	//new method
+	const keys=Object.keys(pointsCol);
+	for (let z=0; z<keys.length ;z++){
+		//keys[z].split('-');//this is the pair of coords
+		//console.log(Number(keys[z].split('-')[0]));
+		//console.log(Number(keys[z].split('-')[1]));
+		ctx.fillRect(Number(keys[z].split('-')[0]) ,Number(keys[z].split('-')[1]), 1, 1 );
+		}
+	
+
 //mouse-move(strafe, up-down)
 /*window.addEventListener('mousemove', function(e){
   x = e.x;
@@ -76,20 +93,6 @@ function backGd(xb, yb){
 	ctx.fillStyle = "lightgreen";
 	ctx.fillRect( xb, yb + 300, 900, 300 );
 	
-	//red walls
-	ctx.fillStyle = "red";
-	//for (let k=0;k<250;k++){
-		//ctx.fillRect( k+20, wall[k] , 1, 1 );//TODO FROM HERE BUT WITH POINTSCALL
-	//}
-		
-	//new method
-	const keys=Object.keys(pointsCol);
-	for (let z=0; z<keys.length ;z++){
-		//keys[z].split('-');//this is the pair of coords
-		//console.log(Number(keys[z].split('-')[0]));
-		//console.log(Number(keys[z].split('-')[1]));
-		ctx.fillRect(Number(keys[z].split('-')[0]) ,Number(keys[z].split('-')[1]), 1, 1 );
-		}
 	
 	
 	//gray/gray lines to circle
@@ -119,27 +122,10 @@ function getCircle(xo, yo, isOffset){
 	let m = 1;
 	let isInter = false;
 	//each FPV ray
-	for(let i=cAngle-90; i<=cAngle; i+=1 ){
+	for(let i=cAngle-90; i<=cAngle; i++ ){
 		isInter= false;
 		
 		//let unitW = m<45?m:(90-m);
-		let unitW = 8;
-		////width is narrower at the edges (UNCOMMENT to use this technique)
-		/*switch(true){
-			case unitW<10:
-				unitW+=5;
-				unitW*=5;
-				break;
-			case unitW<20:
-				unitW*=4;
-				break;
-			case unitW<30:
-				unitW*=3;
-				break;
-			case unitW<45:
-				unitW*=2;
-				break;
-		}*/
 		
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
@@ -152,7 +138,7 @@ function getCircle(xo, yo, isOffset){
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
 		
 			//size of object
-			let unitH = 300/j;
+			const unitH = 300/j;
 			//if(upArrowPressed){console.log("height is "+unitH+" and x pos is "+(m*unitWx+240));}
 			xi = parseInt(Math.sin(i*Math.PI/180)*j+xo);
 			yi = parseInt(-Math.cos(i*Math.PI/180)*j+yo);
@@ -163,8 +149,9 @@ function getCircle(xo, yo, isOffset){
 				if(pointsCol[`${xi}-${yi}`]){
 				//if(((k+20) == xi) && yi == wall[k]){//collision wall[xi-yi]
 					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
+					
 					//correct the overflow bug
-					if((m*unitWx+240 + unitW)>1155) unitW=0;
+					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
 					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset), unitW, (unitH*2)+hOffset);
 
@@ -173,7 +160,7 @@ function getCircle(xo, yo, isOffset){
 					break;
 				}
 			//}
-			//if isInterrupted break
+			//if isInterrupted
 			if (isInter) break;
 		}
 		m++;//m just maps i from 1 to angle
