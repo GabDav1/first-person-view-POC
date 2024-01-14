@@ -11,6 +11,7 @@ let cAngle = 90;
 //position on the horizon line
 const unitWx = 900/90;
 const unitW = 10;
+const unitH = 50;
 
 const pointsCol = {};///points actually
 
@@ -46,21 +47,7 @@ function generateRandomPoint() {
 }
 generateRandomPoint();
 
-//red walls
-	ctx.fillStyle = "red";
-	//for (let k=0;k<250;k++){
-		//ctx.fillRect( k+20, wall[k] , 1, 1 );//TODO FROM HERE BUT WITH POINTSCALL
-	//}
-		
-	//new method
-	const keys=Object.keys(pointsCol);
-	for (let z=0; z<keys.length ;z++){
-		//keys[z].split('-');//this is the pair of coords
-		//console.log(Number(keys[z].split('-')[0]));
-		//console.log(Number(keys[z].split('-')[1]));
-		ctx.fillRect(Number(keys[z].split('-')[0]) ,Number(keys[z].split('-')[1]), 1, 1 );
-		}
-	
+
 
 //mouse-move(strafe, up-down)
 /*window.addEventListener('mousemove', function(e){
@@ -93,6 +80,15 @@ function backGd(xb, yb){
 	ctx.fillStyle = "lightgreen";
 	ctx.fillRect( xb, yb + 300, 900, 300 );
 	
+	//red walls
+	ctx.fillStyle = "red";
+		
+	//new method
+	const keys=Object.keys(pointsCol);
+	for (let z=0; z<keys.length ;z++){
+		//keys[z].split('-');//this is the pair of coords
+		ctx.fillRect(Number(keys[z].split('-')[0]) ,Number(keys[z].split('-')[1]), 1, 1 );
+		}
 	
 	
 	//gray/gray lines to circle
@@ -132,34 +128,34 @@ function getCircle(xo, yo, isOffset){
 		
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
-		const hOffset = (190-j)/2;//unitW;
+		const hOffset = 900/j + 600/j + 300/j + 100/j;//unitW;
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
 		
 			//size of object
-			const unitH = 300/j;
+			//const unitH = 300/j;
 			//if(upArrowPressed){console.log("height is "+unitH+" and x pos is "+(m*unitWx+240));}
 			xi = parseInt(Math.sin(i*Math.PI/180)*j+xo);
 			yi = parseInt(-Math.cos(i*Math.PI/180)*j+yo);
 			//color test
-			const diffColor = i%2===0? 127:255;
+			//const diffColor = i%2===0? 127:255;
+			const diffColor = 127;
+			
 			//wall loop intersect (ray tracing)
-			//for (let k=0;k<200;k++){
 				if(pointsCol[`${xi}-${yi}`]){
-				//if(((k+20) == xi) && yi == wall[k]){//collision wall[xi-yi]
+				
 					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
 					
 					//correct the overflow bug
 					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
-					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset), unitW, (unitH*2)+hOffset);
+					ctx.fillRect( m*unitWx+240, 300 - hOffset/2, unitW, hOffset);
 
-					//exit for
 					isInter=true;
 					break;
 				}
-			//}
+			
 			//if isInterrupted
 			if (isInter) break;
 		}
