@@ -122,7 +122,7 @@ function getCircle(xo, yo, isOffset){
 	for(let i=cAngle-90; i<=cAngle; i+=1 ){
 		isInter= false;
 		
-		//let unitW = m<45?m:(90-m);
+		let unitWH = m<45?m:(90-m);
 		let unitW = 8;
 		////width is narrower at the edges (UNCOMMENT to use this technique)
 		/*switch(true){
@@ -146,7 +146,7 @@ function getCircle(xo, yo, isOffset){
 		
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
-		const hOffset = (190-j)/2;//unitW;
+		const hOffset = (190-j) + unitWH;//unitW;
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
@@ -166,7 +166,7 @@ function getCircle(xo, yo, isOffset){
 					//correct the overflow bug
 					if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
-					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset), unitW, (unitH*2)+hOffset);
+					ctx.fillRect( m*unitWx+240, 300 - (unitH+hOffset)/2, unitW, unitH+hOffset);
 
 					//exit for
 					isInter=true;
