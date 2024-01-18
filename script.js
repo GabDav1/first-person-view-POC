@@ -36,12 +36,24 @@ function generateRandomPoint() {
   const toY = Math.floor(Math.random() * max)+ min;
   
   let y = toY;
+  let ny = toY;
+  
+  //keys are coords, value is wall color
   for (let x=min;x<toX;x++){
-	  pointsCol[`${x}-${y}`] = true;
-	  pointsCol[`${x}-${y+1}`] = true;
-	  pointsCol[`${x}-${toY}`] = true;
-	  pointsCol[`${x}-${toY+1}`] = true;
+	  //first test wall
+	  pointsCol[`${x}-${y}`] = 30;
+	  pointsCol[`${x}-${y+1}`] = 30;
+	  
+	  //second test wall
+	  pointsCol[`${x}-${toY}`] = 180;
+	  pointsCol[`${x}-${toY+1}`] = 180;
+	  
+	  //third test wall
+	  pointsCol[`${min}-${ny}`] = 90;
+	  pointsCol[`${min+1}-${ny}`] = 90;
+	  
 	  y++;
+	  ny--;
   }
   
 }
@@ -117,18 +129,22 @@ function getCircle(xo, yo, isOffset){
 	let yi = yo;
 	let m = 1;
 	let isInter = false;
+	let addNoise = 0, hOffset = 0, diffColor = 0;
+	
 	//each FPV ray
 	for(let i=cAngle-90; i<=cAngle; i++ ){
 		isInter= false;
 		
 		//let unitW = m<45?m:(90-m);
+		addNoise = Math.floor(Math.random() * 8)+ 1;
 		
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
 		
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
-		const hOffset = 900/j + 600/j + 300/j + 100/j;//unitW;
+		
+		hOffset = 900/j + 600/j + 300/j + 100/j;//unitW;
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
@@ -140,7 +156,7 @@ function getCircle(xo, yo, isOffset){
 			yi = parseInt(-Math.cos(i*Math.PI/180)*j+yo);
 			//color test
 			//const diffColor = i%2===0? 127:255;
-			const diffColor = 127;
+			diffColor = pointsCol[`${xi}-${yi}`];
 			
 			//wall loop intersect (ray tracing)
 				if(pointsCol[`${xi}-${yi}`]){
@@ -150,9 +166,10 @@ function getCircle(xo, yo, isOffset){
 					//correct the overflow bug
 					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
-					ctx.fillRect( m*unitWx+240, 300 - hOffset/2, unitW, hOffset);
+					ctx.fillRect( m*unitWx+240, 300 - (hOffset+addNoise)/2 , unitW, hOffset + addNoise);
 
-					isInter=true;
+					isInter=true; //todo: check if these interrupts are consecutive, 
+					//if they are then check that the last height value is identical
 					break;
 				}
 			
