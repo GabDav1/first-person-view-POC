@@ -10,23 +10,12 @@ let speed = 0.5;
 let cAngle = 90;
 //position on the horizon line
 const unitWx = 900/90;
-const unitW = 10;
+const unitW = 10; //todo: play with width scale (catacombs3D columns)
 const unitH = 50;
 
-const pointsCol = {};///points actually
-
-//build the walls!!!
-/*let wall =[];
-for (let k=0;k<50;k++){
-	wall[k] = 50 - k;
-	//wall[k+1] = 50 - k;
-	wall[50+k] = 25 + k;
-	//wall[50+k] = 25 + k;
-	wall[100+k] = 125 + k;
-	//wall[100+k] = 125 + k;
-	wall[150+k] = 195 + k; //todo:parametrize this, all k locations
-	//wall[150+2*k] = 195 + k;
-}*/
+//const pointsCol = {};///points actually
+const pointsCol = [];//points actually
+const walls= [];
 
 function generateRandomPoint() {
   const min = 25;
@@ -38,28 +27,45 @@ function generateRandomPoint() {
   let y = toY;
   let ny = toY;
   
-  //keys are coords, value is wall color
+  //calculate slope for each wall line here (slope m of each line segment)
+  //const mls1 = ((toX - min + toY) - toY) / toX - min;
+  //const mls11 = ((toX - min + toY + 1) - toY - 1) / toX - min;
+  
+  //pre-defined walls
+  walls[0]=[], walls[1]=[], walls[2]=[], walls[3]=[], walls[4]=[], walls[5]=[];
+  
+  //keys are coords, value is properties object
   for (let x=min;x<toX;x++){
 	  //first test wall
-	  pointsCol[`${x}-${y}`] = 30;
-	  pointsCol[`${x}-${y+1}`] = 30;
+	  pointsCol[`${x}-${y}`] = {color:30, slope:90, _x:x, _y:y};
+	  walls[0].push(pointsCol[`${x}-${y}`]);
+	  pointsCol[`${x}-${y+1}`] = {color:30, slope:90, _x:x, _y:y+1};
+	  walls[1].push(pointsCol[`${x}-${y+1}`]);
 	  
 	  //second test wall
-	  pointsCol[`${x}-${toY}`] = 180;
-	  pointsCol[`${x}-${toY+1}`] = 180;
+	  pointsCol[`${x}-${toY}`] = {color:180, slope:90, _x:x, _y:toY};
+	  walls[2].push(pointsCol[`${x}-${toY}`]);
+	  pointsCol[`${x}-${toY+1}`] = {color:180, slope:90, _x:x, _y:toY+1};
+	  walls[3].push(pointsCol[`${x}-${toY+1}`]);
 	  
 	  //third test wall
-	  pointsCol[`${min}-${ny}`] = 90;
-	  pointsCol[`${min+1}-${ny}`] = 90;
+	  pointsCol[`${min}-${ny}`] = {color:130, slope:90, _x:min, _y:ny};
+	  walls[4].push(pointsCol[`${min}-${ny}`]);
+	  pointsCol[`${min+1}-${ny}`] = {color:130, slope:90, _x:min+1, _y:ny};
+	  walls[5].push(pointsCol[`${min+1}-${ny}`]);
 	  
 	  y++;
 	  ny--;
   }
+  //calculate slope for each wall
+  walls.forEach((wall)=>{
+	 const mSlope = Number((wall[wall.length-1]._y - wall[0]._y) / (wall[wall.length-1]._x - wall[0]._x));
+	 wall.forEach((point)=> point.slope=mSlope);	
+  });
   
 }
+
 generateRandomPoint();
-
-
 
 //mouse-move(strafe, up-down)
 /*window.addEventListener('mousemove', function(e){
@@ -136,7 +142,7 @@ function getCircle(xo, yo, isOffset){
 		isInter= false;
 		
 		//let unitW = m<45?m:(90-m);
-		addNoise = Math.floor(Math.random() * 8)+ 1;
+		addNoise = Math.floor(Math.random() * 10)+ 1;
 		
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
@@ -154,22 +160,25 @@ function getCircle(xo, yo, isOffset){
 			//if(upArrowPressed){console.log("height is "+unitH+" and x pos is "+(m*unitWx+240));}
 			xi = parseInt(Math.sin(i*Math.PI/180)*j+xo);
 			yi = parseInt(-Math.cos(i*Math.PI/180)*j+yo);
-			//color test
-			//const diffColor = i%2===0? 127:255;
-			diffColor = pointsCol[`${xi}-${yi}`];
 			
 			//wall loop intersect (ray tracing)
 				if(pointsCol[`${xi}-${yi}`]){
 				
+					//wall color
+					diffColor = pointsCol[`${xi}-${yi}`].color;
+					
 					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
 					
 					//correct the overflow bug
 					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
-					ctx.fillRect( m*unitWx+240, 300 - (hOffset+addNoise)/2 , unitW, hOffset + addNoise);
+					ctx.fillRect( m*unitWx+240, 300 - (hOffset +addNoise)/2 , unitW, hOffset + addNoise);//
+					
+					ctx.fillStyle = "white";
+					ctx.font= "9px serif";
+					ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 50 + 7*(m%2));
 
-					isInter=true; //todo: check if these interrupts are consecutive, 
-					//if they are then check that the last height value is identical
+					isInter=true; 
 					break;
 				}
 			
