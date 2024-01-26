@@ -31,7 +31,7 @@ function generateRandomPoint() {
   //const mls1 = ((toX - min + toY) - toY) / toX - min;
   //const mls11 = ((toX - min + toY + 1) - toY - 1) / toX - min;
   
-  //pre-defined walls
+  //pre-defined(hard coded for now) walls
   walls[0]=[], walls[1]=[], walls[2]=[], walls[3]=[], walls[4]=[], walls[5]=[];
   
   //keys are coords, value is properties object
@@ -48,7 +48,7 @@ function generateRandomPoint() {
 	  pointsCol[`${x}-${toY+1}`] = {color:180, slope:90, _x:x, _y:toY+1};
 	  walls[3].push(pointsCol[`${x}-${toY+1}`]);
 	  
-	  //third test wall
+	  //third test wall(vertical)
 	  pointsCol[`${min}-${ny}`] = {color:130, slope:90, _x:min, _y:ny};
 	  walls[4].push(pointsCol[`${min}-${ny}`]);
 	  pointsCol[`${min+1}-${ny}`] = {color:130, slope:90, _x:min+1, _y:ny};
@@ -57,10 +57,20 @@ function generateRandomPoint() {
 	  y++;
 	  ny--;
   }
+	  
   //calculate slope for each wall
   walls.forEach((wall)=>{
-	 const mSlope = Number((wall[wall.length-1]._y - wall[0]._y) / (wall[wall.length-1]._x - wall[0]._x));
-	 wall.forEach((point)=> point.slope=mSlope);	
+	const dtY = Math.max(wall[wall.length-1]._y, wall[0]._y) - Math.min(wall[wall.length-1]._y, wall[0]._y);
+	const dtX = Math.max(wall[wall.length-1]._x, wall[0]._x) - Math.min(wall[wall.length-1]._x, wall[0]._x);
+	
+	let mSlope = Number((wall[wall.length-1]._y - wall[0]._y) / (wall[wall.length-1]._x - wall[0]._x));
+	
+	//slope of horizontal line
+	if(dtY===0) mSlope = 0;
+	//slope of vertical line
+	if(dtX===0) mSlope = 100;
+	
+	wall.forEach((point)=> point.slope=mSlope);	
   });
   
 }
@@ -142,7 +152,7 @@ function getCircle(xo, yo, isOffset){
 		isInter= false;
 		
 		//let unitW = m<45?m:(90-m);
-		addNoise = Math.floor(Math.random() * 10)+ 1;
+		addNoise = Math.floor(Math.random() * 5)+ 1;
 		
 		//each point on the current player-arc line
 		for(let j = 1; j <190; ++j){
@@ -150,7 +160,8 @@ function getCircle(xo, yo, isOffset){
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
 		
-		hOffset = 900/j + 600/j + 300/j + 100/j;//unitW;
+		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 1900/j + 2100/j + 2400/j + 2600/j + 2700/j;
+		//hOffset = 190/j + 280/j + 95/j + 285/j;
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
@@ -177,7 +188,10 @@ function getCircle(xo, yo, isOffset){
 					ctx.fillStyle = "white";
 					ctx.font= "9px serif";
 					ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 50 + 7*(m%2));
-
+					
+					//distance to each column
+					ctx.fillText(j, m*unitWx+240, 150 + 7*(m%2));
+					
 					isInter=true; 
 					break;
 				}
