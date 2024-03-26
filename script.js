@@ -26,6 +26,9 @@ function generateRandomPoint() {
   
   let y = toY;
   let ny = toY;
+  const height1 = 0;
+  const height2 = 50;
+  const height3 = 150;
   
   //calculate slope for each wall line here (slope m of each line segment)
   //const mls1 = ((toX - min + toY) - toY) / toX - min;
@@ -37,21 +40,21 @@ function generateRandomPoint() {
   //keys are coords, value is properties object
   for (let x=min;x<toX;x++){
 	  //first test wall
-	  pointsCol[`${x}-${y}`] = {color:30, slope:90, _x:x, _y:y};
+	  pointsCol[`${x}-${y}`] = {color:30, slope:90, _x:x, _y:y, _height:height1};
 	  walls[0].push(pointsCol[`${x}-${y}`]);
-	  pointsCol[`${x}-${y+1}`] = {color:30, slope:90, _x:x, _y:y+1};
+	  pointsCol[`${x}-${y+1}`] = {color:30, slope:90, _x:x, _y:y+1, _height:height1};
 	  walls[1].push(pointsCol[`${x}-${y+1}`]);
 	  
 	  //second test wall
-	  pointsCol[`${x}-${toY}`] = {color:180, slope:90, _x:x, _y:toY};
+	  pointsCol[`${x}-${toY}`] = {color:180, slope:90, _x:x, _y:toY, _height:height2};
 	  walls[2].push(pointsCol[`${x}-${toY}`]);
-	  pointsCol[`${x}-${toY+1}`] = {color:180, slope:90, _x:x, _y:toY+1};
+	  pointsCol[`${x}-${toY+1}`] = {color:180, slope:90, _x:x, _y:toY+1, _height:height2};
 	  walls[3].push(pointsCol[`${x}-${toY+1}`]);
 	  
 	  //third test wall(vertical)
-	  pointsCol[`${min}-${ny}`] = {color:130, slope:90, _x:min, _y:ny};
+	  pointsCol[`${min}-${ny}`] = {color:130, slope:90, _x:min, _y:ny, _height:height3};
 	  walls[4].push(pointsCol[`${min}-${ny}`]);
-	  pointsCol[`${min+1}-${ny}`] = {color:130, slope:90, _x:min+1, _y:ny};
+	  pointsCol[`${min+1}-${ny}`] = {color:130, slope:90, _x:min+1, _y:ny, _height:height3};
 	  walls[5].push(pointsCol[`${min+1}-${ny}`]);
 	  
 	  y++;
@@ -118,25 +121,6 @@ function backGd(xb, yb){
 		ctx.fillRect(Number(keys[z].split('-')[0]) ,Number(keys[z].split('-')[1]), 1, 1 );
 		}
 	
-	
-	//gray/gray lines to circle
-	/*for(let i=cAngle-90; i<=cAngle; i+=15 ){
-		ctx.beginPath();
-		i>(cAngle-45)? ctx.strokeStyle = "gray" : ctx.strokeStyle = "gray";
-		ctx.moveTo(x,y);
-		//if(i==cAngle-45) ctx.strokeStyle = "red";
-		ctx.lineTo( Math.sin(i*Math.PI/180)*190+x, -Math.cos(i*Math.PI/180)*190+y);
-		ctx.stroke();
-
-		//red line for 1px to the right offset
-		/*ctx.beginPath();
-		i>(cAngle-45)? ctx.strokeStyle = "red" : ctx.strokeStyle = "red";
-		ctx.moveTo(xo1,yo1);
-		//if(i==cAngle-45) ctx.strokeStyle = "red";
-		ctx.lineTo( Math.sin(i*Math.PI/180)*190+xo1, -Math.cos(i*Math.PI/180)*190+yo1);
-		ctx.stroke();
-	}*/
-	
 }
 
 function getCircle(xo, yo, isOffset){
@@ -151,16 +135,13 @@ function getCircle(xo, yo, isOffset){
 	for(let i=cAngle-90; i<=cAngle; i++ ){
 		isInter= false;
 		
-		//let unitW = m<45?m:(90-m);
-		addNoise = Math.floor(Math.random() * 5)+ 1;
-		
 		//each point on the current player-arc line
-		for(let j = 1; j <190; ++j){
+		for(let j = 190; j >0; --j){
 		
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
 		
-		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 1900/j + 2100/j + 2400/j + 2600/j + 2700/j;
+		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 2700/j;
 		//hOffset = 190/j + 280/j + 95/j + 285/j;
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
@@ -174,6 +155,9 @@ function getCircle(xo, yo, isOffset){
 			
 			//wall loop intersect (ray tracing)
 				if(pointsCol[`${xi}-${yi}`]){
+					
+					//let unitW = m<45?m:(90-m);
+					addNoise = pointsCol[`${xi}-${yi}`]._height;
 				
 					//wall color
 					diffColor = pointsCol[`${xi}-${yi}`].color;
@@ -183,21 +167,24 @@ function getCircle(xo, yo, isOffset){
 					//correct the overflow bug
 					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
-					ctx.fillRect( m*unitWx+240, 300 - (hOffset +addNoise)/2 , unitW, hOffset + addNoise);//
+					//render the wall
+					ctx.fillRect( m*unitWx+240, 300 - (hOffset)/2 , unitW, -hOffset - addNoise);
 					
 					ctx.fillStyle = "white";
 					ctx.font= "9px serif";
+					
+					//slope of corresponding wall
 					ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 50 + 7*(m%2));
 					
 					//distance to each column
 					ctx.fillText(j, m*unitWx+240, 150 + 7*(m%2));
 					
 					isInter=true; 
-					break;
+					//break;
 				}
 			
 			//if isInterrupted
-			if (isInter) break;
+			//if (isInter) break; turn off depth interrupt
 		}
 		m++;//m just maps i from 1 to angle
 	}
