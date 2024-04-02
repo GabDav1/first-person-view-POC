@@ -27,8 +27,8 @@ function generateRandomPoint() {
   let y = toY;
   let ny = toY;
   const height1 = 0;
-  const height2 = 50;
-  const height3 = 150;
+  const height2 = 50;//0
+  const height3 = 150;//0
   
   //calculate slope for each wall line here (slope m of each line segment)
   //const mls1 = ((toX - min + toY) - toY) / toX - min;
@@ -141,8 +141,8 @@ function getCircle(xo, yo, isOffset){
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
 		
-		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 2700/j;
-		//hOffset = 190/j + 280/j + 95/j + 285/j;
+		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 2700/j; //todo: height harmonic -> thousands range
+
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
@@ -168,7 +168,7 @@ function getCircle(xo, yo, isOffset){
 					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
 					//render the wall
-					ctx.fillRect( m*unitWx+240, 300 - (hOffset)/2 , unitW, -hOffset - addNoise);
+					ctx.fillRect( m*unitWx+240, 300 + (hOffset)/2, unitW, -1*(hOffset + addNoise));
 					
 					ctx.fillStyle = "white";
 					ctx.font= "9px serif";
