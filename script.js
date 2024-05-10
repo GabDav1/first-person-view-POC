@@ -145,7 +145,7 @@ function getCircle(xo, yo, isOffset){
 
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
-		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
+		if(!isInter) ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
 		
 			//size of object
 			//const unitH = 300/j;
@@ -155,7 +155,12 @@ function getCircle(xo, yo, isOffset){
 			
 			//wall loop intersect (ray tracing)
 				if(pointsCol[`${xi}-${yi}`]){
-					
+				
+					//calculate slope of ray
+					let mRay = (yi-yo) / (xi-xo);
+					if(yi-yo===0) mRay = 0;
+					if(xi-xo===0) mRay = 100;
+
 					//let unitW = m<45?m:(90-m);
 					addNoise = pointsCol[`${xi}-${yi}`]._height;
 				
@@ -174,13 +179,15 @@ function getCircle(xo, yo, isOffset){
 					ctx.font= "9px serif";
 					
 					//slope of corresponding wall
-					ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 50 + 7*(m%2));
+					//ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 150 + 7*(m%2));
+					
+					//slope of corresponding ray
+					ctx.fillText(mRay, m*unitWx+240, 150 + 7*(m%2));
 					
 					//distance to each column
-					ctx.fillText(j, m*unitWx+240, 150 + 7*(m%2));
+					//ctx.fillText(j, m*unitWx+240, 150 + 7*(m%2));
 					
-					isInter=true; 
-					//break;
+					isInter=true;
 				}
 			
 			//if isInterrupted
