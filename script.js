@@ -27,8 +27,8 @@ function generateRandomPoint() {
   let y = toY;
   let ny = toY;
   const height1 = 0;
-  const height2 = 50;//0
-  const height3 = 150;//0
+  const height2 = 50;
+  const height3 = 150;
   
   //calculate slope for each wall line here (slope m of each line segment)
   //const mls1 = ((toX - min + toY) - toY) / toX - min;
@@ -40,21 +40,21 @@ function generateRandomPoint() {
   //keys are coords, value is properties object
   for (let x=min;x<toX;x++){
 	  //first test wall
-	  pointsCol[`${x}-${y}`] = {color:30, slope:90, _x:x, _y:y, _height:height1};
+	  pointsCol[`${x}-${y}`] = {color:120, slope:90, _x:x, _y:y, _height:height1};
 	  walls[0].push(pointsCol[`${x}-${y}`]);
-	  pointsCol[`${x}-${y+1}`] = {color:30, slope:90, _x:x, _y:y+1, _height:height1};
+	  pointsCol[`${x}-${y+1}`] = {color:120, slope:90, _x:x, _y:y+1, _height:height1};
 	  walls[1].push(pointsCol[`${x}-${y+1}`]);
 	  
 	  //second test wall
-	  pointsCol[`${x}-${toY}`] = {color:180, slope:90, _x:x, _y:toY, _height:height2};
+	  pointsCol[`${x}-${toY}`] = {color:120, slope:90, _x:x, _y:toY, _height:height2};
 	  walls[2].push(pointsCol[`${x}-${toY}`]);
-	  pointsCol[`${x}-${toY+1}`] = {color:180, slope:90, _x:x, _y:toY+1, _height:height2};
+	  pointsCol[`${x}-${toY+1}`] = {color:120, slope:90, _x:x, _y:toY+1, _height:height2};
 	  walls[3].push(pointsCol[`${x}-${toY+1}`]);
 	  
 	  //third test wall(vertical)
-	  pointsCol[`${min}-${ny}`] = {color:130, slope:90, _x:min, _y:ny, _height:height3};
+	  pointsCol[`${min}-${ny}`] = {color:120, slope:90, _x:min, _y:ny, _height:height3};
 	  walls[4].push(pointsCol[`${min}-${ny}`]);
-	  pointsCol[`${min+1}-${ny}`] = {color:130, slope:90, _x:min+1, _y:ny, _height:height3};
+	  pointsCol[`${min+1}-${ny}`] = {color:120, slope:90, _x:min+1, _y:ny, _height:height3};
 	  walls[5].push(pointsCol[`${min+1}-${ny}`]);
 	  
 	  y++;
@@ -69,9 +69,9 @@ function generateRandomPoint() {
 	let mSlope = Number((wall[wall.length-1]._y - wall[0]._y) / (wall[wall.length-1]._x - wall[0]._x));
 	
 	//slope of horizontal line
-	if(dtY===0) mSlope = 0;
+	if(dtY===0) mSlope = 0.1;
 	//slope of vertical line
-	if(dtX===0) mSlope = 100;
+	if(dtX===0) mSlope = 10;
 	
 	wall.forEach((point)=> point.slope=mSlope);	
   });
@@ -129,23 +129,22 @@ function getCircle(xo, yo, isOffset){
 	let yi = yo;
 	let m = 1;
 	let isInter = false;
-	let addNoise = 0, hOffset = 0, diffColor = 0;
+	let addHeight = 0, hOffset = 0, diffColor = 0;
 	
 	//each FPV ray
 	for(let i=cAngle-90; i<=cAngle; i++ ){
 		isInter= false;
-		
 		//each point on the current player-arc line
-		for(let j = 190; j >0; --j){
+		for(let j = 200; j >0; --j){
 		
 		//test width=inverse of distance from object
 		//let unitW = ((190-j)/90)*unitWx;
 		
-		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 2700/j; //todo: height harmonic -> thousands range
+		hOffset = 3600/j; //todo: height harmonic -> thousands range
 
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
-		if(!isInter) ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
+		if(isInter) ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
 		
 			//size of object
 			//const unitH = 300/j;
@@ -158,40 +157,42 @@ function getCircle(xo, yo, isOffset){
 				
 					//calculate slope of ray
 					let mRay = (yi-yo) / (xi-xo);
-					if(yi-yo===0) mRay = 0;
-					if(xi-xo===0) mRay = 100;
+					if(yi-yo===0) mRay = 0.1;
+					if(xi-xo===0) mRay = 10;
 
 					//let unitW = m<45?m:(90-m);
-					addNoise = pointsCol[`${xi}-${yi}`]._height;
+					addHeight = pointsCol[`${xi}-${yi}`]._height;
 				
 					//wall color
 					diffColor = pointsCol[`${xi}-${yi}`].color;
-					
-					ctx.fillStyle = "rgb(" + (255/90)*i + ", " + (255/190)*j + `, ${diffColor})`;
+					//angle between ray and wall
+					const tanphi = Math.atan(Math.abs(mRay - pointsCol[`${xi}-${yi}`].slope / (1 + mRay * pointsCol[`${xi}-${yi}`].slope))) * (180 / Math.PI)
+					const colorMltpl = tanphi * 2;
+					ctx.fillStyle = "rgb(" + (35 + colorMltpl) + ", " + (35 + colorMltpl) + `, ${(diffColor + colorMltpl)})`;
 					
 					//correct the overflow bug
-					//if((m*unitWx+240 + unitW)>1155) unitW=0;
+					if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
 					//render the wall
-					ctx.fillRect( m*unitWx+240, 300 + (hOffset)/2, unitW, -1*(hOffset + addNoise));
+					ctx.fillRect( m*unitWx+240, 300 + (hOffset / 2), unitW, -1*(hOffset + addHeight));
 					
 					ctx.fillStyle = "white";
 					ctx.font= "9px serif";
 					
+
 					//slope of corresponding wall
-					//ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 150 + 7*(m%2));
-					
+					ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 275 + 7*(m%2));
 					//slope of corresponding ray
-					ctx.fillText(mRay, m*unitWx+240, 150 + 7*(m%2));
-					
+					ctx.fillText(mRay, m*unitWx+240, 250 + 7*(m%2));
 					//distance to each column
 					//ctx.fillText(j, m*unitWx+240, 150 + 7*(m%2));
+					//angle
+					ctx.fillText(tanphi, m*unitWx+240, 300 + 17*(m%2));
 					
-					isInter=true;
 				}
 			
-			//if isInterrupted
-			//if (isInter) break; turn off depth interrupt
+			//leave every 3rd ray
+			if(m%5 === 0) isInter=true;
 		}
 		m++;//m just maps i from 1 to angle
 	}
