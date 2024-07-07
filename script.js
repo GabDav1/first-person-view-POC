@@ -160,6 +160,10 @@ function getCircle(xo, yo, isOffset){
 					if(yi-yo===0) mRay = 0.1;
 					if(xi-xo===0) mRay = 10;
 
+					// handle wall slope exceptions
+					if(pointsCol[`${xi}-${yi}`].slope === 10 && (mRay >= 0.99 || mRay <= -0.99)) mRay = 0.9;
+					if(pointsCol[`${xi}-${yi}`].slope === 1 && (mRay >= 0.99 || mRay <= -0.99)) mRay /= 10;
+
 					//let unitW = m<45?m:(90-m);
 					addHeight = pointsCol[`${xi}-${yi}`]._height;
 				
