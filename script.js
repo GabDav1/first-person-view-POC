@@ -1,3 +1,6 @@
+import * as inpts from './inputs.js'
+import {generateWalls} from './bckgds.js'
+
 const canvas = document.getElementById("spaceArea");
 const ctx = canvas.getContext("2d");
 
@@ -20,9 +23,9 @@ for(let i=0; i<=99; i++ ){
 	prevIntersect[i] = {height: 0};
 }
 
-
-const pointsCol = [];//points actually
-const walls= [];
+//all points that form the walls
+const pointsCol = generateWalls()[1];
+const walls= generateWalls()[0];
 
 //wall texture
 const img = new Image();
@@ -33,86 +36,21 @@ img.onload = function() {
             canDraw = true;
         };
 
-function generateRandomPoint() {
-  const min = 25;
-  const max = 250;
-  
-  const toX = Math.floor(Math.random() * max)+ min;
-  const toY = Math.floor(Math.random() * max)+ min;
-  
-  let y = toY;
-  let ny = toY;
-  const height1 = 0;
-  const height2 = 0;
-  const height3 = 0;
-  
-  //calculate slope for each wall line here (slope m of each line segment)
-  //const mls1 = ((toX - min + toY) - toY) / toX - min;
-  //const mls11 = ((toX - min + toY + 1) - toY - 1) / toX - min;
-  
-  //pre-defined(hard coded for now) walls
-  walls[0]=[], walls[1]=[], walls[2]=[], walls[3]=[], walls[4]=[], walls[5]=[];
-  
-  //keys are coords, value is properties object
-  for (let x=min;x<toX;x++){
-	  //first test wall
-	  pointsCol[`${x}-${y}`] = {color:120, slope:90, _x:x, _y:y, _height:height1};
-	  walls[0].push(pointsCol[`${x}-${y}`]);
-	  pointsCol[`${x}-${y+1}`] = {color:120, slope:90, _x:x, _y:y+1, _height:height1};
-	  walls[1].push(pointsCol[`${x}-${y+1}`]);
-	  
-	  //second test wall
-	  pointsCol[`${x}-${toY}`] = {color:120, slope:90, _x:x, _y:toY, _height:height2};
-	  walls[2].push(pointsCol[`${x}-${toY}`]);
-	  pointsCol[`${x}-${toY+1}`] = {color:120, slope:90, _x:x, _y:toY+1, _height:height2};
-	  walls[3].push(pointsCol[`${x}-${toY+1}`]);
-	  
-	  //third test wall(vertical)
-	  pointsCol[`${min}-${ny}`] = {color:120, slope:90, _x:min, _y:ny, _height:height3};
-	  walls[4].push(pointsCol[`${min}-${ny}`]);
-	  pointsCol[`${min+1}-${ny}`] = {color:120, slope:90, _x:min+1, _y:ny, _height:height3};
-	  walls[5].push(pointsCol[`${min+1}-${ny}`]);
-	  
-	  y++;
-	  ny--;
-  }
-	  
-  //calculate slope for each wall
-  walls.forEach((wall)=>{
-	const dtY = Math.max(wall[wall.length-1]._y, wall[0]._y) - Math.min(wall[wall.length-1]._y, wall[0]._y);
-	const dtX = Math.max(wall[wall.length-1]._x, wall[0]._x) - Math.min(wall[wall.length-1]._x, wall[0]._x);
-	
-	let mSlope = Number((wall[wall.length-1]._y - wall[0]._y) / (wall[wall.length-1]._x - wall[0]._x));
-	
-	//slope of horizontal line
-	if(dtY===0) mSlope = 0;
-	//slope of vertical line
-	if(dtX===0) mSlope = 10;
-	
-	wall.forEach((point)=> point.slope=mSlope);	
-  });
-  
-}
+//mouse-edit
+window.addEventListener('mouseclick', function(e){
+  const m_x = e.x;
+  const m_y = e.y;
 
-generateRandomPoint();
-
-//mouse-move(strafe, up-down)
-/*window.addEventListener('mousemove', function(e){
-  x = e.x;
-  y = e.y;
-});*/
-
-let upArrowPressed = false; //has up been pressed - default state false
-let downArrowPressed = false; //has down been pressed - default state false
-let leftArrowPressed = false; //has left key been pressed - default state false
-let rightArrowPressed = false; //has right key been pressed - default state false
+  //console.log(m_x);
+  pointsCol[`${m_x}-${m_y}`] = {color:120, slope:90, _x:m_x, _y:m_y, _height:0};
+});
 
 //Game Loop
 function drawSpace(){
     requestAnimationFrame(drawSpace);
     
 	clearScreen();
-	inputs();
+	inputsa();
     backGd(250, 0);
 	boundryCheck();
 	
@@ -154,16 +92,11 @@ function getCircle(xo, yo, isOffset){
 
 	//each FPV ray
 	for(let i=cAngle-fAngle; i<=cAngle; i++ ){
-		//prevIntersect[m][0] = 0;
-		//prevIntersect[m][1] = 0;
 
 		isInter= false;
 		//each point on the current player-arc line
 		for(let j=0; j<200; j++){
 		
-			//test width=inverse of distance from object
-			//let unitW = ((190-j)/90)*unitWx;
-			
 			hOffset = 3600/(j);
 			//if(j<20) hOffset = 9000/(j + j/2);
 
@@ -179,8 +112,6 @@ function getCircle(xo, yo, isOffset){
 			if(pointsCol[`${xi}-${yi}`]){
 						
 						//for adjusting segment height to make a smooth wall
-						//prevIntersect[m][0] = pointsCol[`${xi}-${yi}`];
-						//segment's intented height
 						prevIntersect[m] = {height: j};
 
 						if(m > 0) {
@@ -189,7 +120,6 @@ function getCircle(xo, yo, isOffset){
 							if(lastSegment===0) lastSegment = curHt; //init lastSegment
 
 								//same wall
-								//if((prevIntersect[m][0].slope === prevIntersect[m-1][0].slope) && (j<20))
 								if(curHt<20) {
 									// same height for 2 consecutive segments
 									if(curHt === prevHt){
@@ -197,7 +127,6 @@ function getCircle(xo, yo, isOffset){
 										lastSegment > curHt ?  addHeight+=3 : addHeight-=3;
 									} else {
 										addHeight = 0;
-										//prevIntersect[m][1] < prevIntersect[m-1][1] ? toIncr=false : toIncr=true;
 										lastSegment = prevHt;
 									} 
 									
@@ -224,24 +153,16 @@ function getCircle(xo, yo, isOffset){
 						//render the wall
 						ctx.fillRect(m*unitWx+240, 300 + ((hOffset + addHeight) / 2), unitW, -1*(hOffset + addHeight));
 						
-						//correct the overflow bug
-						//if((m*unitWx+240 + unitW)>1155) unitW=0;
-						
-					    //textured render
-						//canDraw && ctx.drawImage(img, m*unitWx+240, 300 + ((pointsCol[`${xi}-${yi}`]._height + addHeight) / 2), unitW, -1*(pointsCol[`${xi}-${yi}`]._height + addHeight));
-						
 						ctx.fillStyle = "white";
 						ctx.font= "9px serif";
 
 						//test smoothing array
 						ctx.fillText(parseInt(m), m*unitWx+240, 200 + 7*(m%2));
 						ctx.fillText(addHeight, m*unitWx+240, 225 + 7*(m%2));
-
 						//slope of corresponding wall
 						//ctx.fillText(pointsCol[`${xi}-${yi}`].slope, m*unitWx+240, 275 + 7*(m%2));
 						//slope of corresponding ray
 						//ctx.fillText(mRay, m*unitWx+240, 250 + 7*(m%2));
-						
 						//distance to each column
 						ctx.fillText(prevIntersect[m].height, m*unitWx+240, 250 + 7*(m%2));
 						ctx.fillText(lastSegment, m*unitWx+240, 275 + 7*(m%2));
@@ -250,9 +171,6 @@ function getCircle(xo, yo, isOffset){
 						
 						isInter=true;
 					}
-				
-				//leave every 5th ray
-				//if(m%5 === 0) isInter=true;
 				if(isInter) break;
 		}
 		m++;//m just maps i from 1 to angle
@@ -263,41 +181,6 @@ function getCircle(xo, yo, isOffset){
 
 //_______________________________________________________________________________________________________
 
-
-
-function inputs(){
-    if(upArrowPressed){
-        //y-=speed;
-		//ctx.lineTo( Math.sin(i*Math.PI/180)*190+x, -Math.cos(i*Math.PI/180)*190+y);
-		x = Math.sin((cAngle-fAngle/2)*Math.PI/180)*speed+x;
-		y = -Math.cos((cAngle-fAngle/2)*Math.PI/180)*speed+y;
-		//isUp = true;
-		xo1 = x-1;
-		yo1 = y;
-    }
-    if(downArrowPressed){
-        //y+=speed;
-		//x = Math.sin((cAngle+fAngle/2+fAngle)*Math.PI/180)*speed+x;
-		x = Math.sin((cAngle+135)*Math.PI/180)*speed+x;
-		//y = -Math.cos((cAngle+fAngle/2+fAngle)*Math.PI/180)*speed+y;
-		y = -Math.cos((cAngle+135)*Math.PI/180)*speed+y;
-		//isUp = false;
-		xo1 = x-1;
-		yo1 = y;
-    }
-    if(leftArrowPressed){
-        //x-=speed;
-		cAngle--;
-		
-		//isRight = false;
-    }
-    if(rightArrowPressed){
-        //x+=speed;
-		cAngle++;
-		//strafe right:x = Math.sin((cAngle+45)*Math.PI/180)*speed+x; y = -Math.cos((cAngle+45)*Math.PI/180)*speed+y;
-		//isRight = true;
-    }
-}
 
 function boundryCheck(){
     //up bounce if(y < radius){ y+=35; }
@@ -319,37 +202,31 @@ function clearScreen(){
     ctx.fillRect(0,0, canvas.width, canvas.height);
 };
 
-document.body.addEventListener("keydown", keyDown); //press key
-document.body.addEventListener("keyup", keyUp); //release key
+inpts.bindListener()
 
-function keyDown(event){
-    if(event.keyCode == 38){
-        upArrowPressed = true; // keycode value for up arrow 38
+function inputsa(){
+    if(inpts.upArrowPressed){
+        //y-=speed;
+		//ctx.lineTo( Math.sin(i*Math.PI/180)*190+x, -Math.cos(i*Math.PI/180)*190+y);
+		x = Math.sin((cAngle-fAngle/2)*Math.PI/180)*speed+x;
+		y = -Math.cos((cAngle-fAngle/2)*Math.PI/180)*speed+y;
+		//isUp = true;
+		xo1 = x-1;
+		yo1 = y;
     }
-    if(event.keyCode == 40){
-        downArrowPressed = true; //keycode value for down arrow 40
+    if(inpts.downArrowPressed){
+        //y+=speed;
+		//x = Math.sin((cAngle+fAngle/2+fAngle)*Math.PI/180)*speed+x;
+		x = Math.sin((cAngle+135)*Math.PI/180)*speed+x;
+		//y = -Math.cos((cAngle+fAngle/2+fAngle)*Math.PI/180)*speed+y;
+		y = -Math.cos((cAngle+135)*Math.PI/180)*speed+y;
+		//isUp = false;
+		xo1 = x-1;
+		yo1 = y;
     }
-    if(event.keyCode == 37){
-        leftArrowPressed = true; //keycode value for left arrow 37
-    }
-    if(event.keyCode == 39){
-        rightArrowPressed = true; //keycode value for right arrow 39
-    }
-};
-
-function keyUp(event){
-    if(event.keyCode == 38){
-        upArrowPressed = false;
-    }
-    if(event.keyCode == 40){
-        downArrowPressed = false; 
-    }
-    if(event.keyCode == 37){
-        leftArrowPressed = false; 
-    }
-    if(event.keyCode == 39){
-        rightArrowPressed = false; 
-    }
-};
+    //strafe right:x = Math.sin((cAngle+45)*Math.PI/180)*speed+x; y = -Math.cos((cAngle+45)*Math.PI/180)*speed+y;
+    if(inpts.leftArrowPressed){	cAngle--;}
+    if(inpts.rightArrowPressed){ cAngle++;}
+}
 
 drawSpace();
