@@ -11,7 +11,7 @@ let cAngle = 90;
 //position on the horizon line
 const unitWx = 900/90;
 const unitW = 10; //todo: play with width scale (catacombs3D columns)
-const unitH = 50;
+const unitH = 600;
 
 //const pointsCol = {};///points actually
 const pointsCol = [];//points actually
@@ -107,9 +107,9 @@ function drawSpace(){
 function backGd(xb, yb){
 	// white/gray fpv screen
 	ctx.fillStyle = "lightblue";
-	ctx.fillRect( xb, yb, 900, 300 );
+	ctx.fillRect( xb, yb, 900, unitH/2 );
 	ctx.fillStyle = "lightgreen";
-	ctx.fillRect( xb, yb + 300, 900, 300 );
+	ctx.fillRect( xb, yb + unitH/2, 900, unitH/2 );
 	
 	//red walls
 	ctx.fillStyle = "red";
@@ -142,7 +142,7 @@ function getCircle(xo, yo, isOffset){
 		//let unitW = ((190-j)/90)*unitWx;
 		
 		hOffset = 900/j + 600/j + 300/j + 100/j + 1200/j + 1500/j + 2700/j;
-		//hOffset = 190/j + 280/j + 95/j + 285/j;
+		//hOffset = 190/j;
 		//test rays		
 		ctx.fillStyle = "rgb(" + (255/190)*j + ", " + 100 + ", 100)";
 		ctx.fillRect( parseInt(Math.sin(i*Math.PI/180)*j+xo), parseInt(-Math.cos(i*Math.PI/180)*j+yo), 1, 1);
@@ -157,7 +157,8 @@ function getCircle(xo, yo, isOffset){
 				if(pointsCol[`${xi}-${yi}`]){
 					
 					//let unitW = m<45?m:(90-m);
-					addNoise = pointsCol[`${xi}-${yi}`]._height;
+					//addNoise = pointsCol[`${xi}-${yi}`]._height;
+					addNoise = 0;
 				
 					//wall color
 					diffColor = pointsCol[`${xi}-${yi}`].color;
@@ -168,8 +169,11 @@ function getCircle(xo, yo, isOffset){
 					//if((m*unitWx+240 + unitW)>1155) unitW=0;
 					
 					//render the wall
-					ctx.fillRect( m*unitWx+240, 300 - (hOffset)/2 , unitW, -hOffset - addNoise);
-					
+					ctx.fillRect( m*unitWx+240, unitH/2 + (hOffset) , unitW, -hOffset - addNoise); // fly above the walls????????????
+					//ctx.fillRect( m*unitWx+240, unitH/2 - (hOffset) , unitW, -hOffset - addNoise); // crawl below the walls
+					//ctx.fillRect( m*unitWx+240, unitH/2 , unitW, -hOffset - addNoise); // mid - straight lower boundry
+					//ctx.fillRect( m*unitWx+240, (unitH + hOffset)/2 , unitW, -hOffset - addNoise); // normal
+
 					ctx.fillStyle = "white";
 					ctx.font= "9px serif";
 					
